@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  mariadb:
+    image: mariadb
+    restart: always
+    ports:
+      - 8103:3306
+    environment:
+      MYSQL_USER: almex_user
+      MYSQL_ROOT_PASSWORD: test123test!
+      MYSQL_DATABASE: almex_db
+      MYSQL_PASSWORD: test123test!
+    networks:
+      - backend
+
+  wordpress:
+    depends_on:
+      - mariadb
+    image: wordpress
+    ports:
+      - 8102:80
+    restart: always
+    volumes:
+      - ./www-html/:/var/www/html
+    environment:
+      VIRTUAL_HOST: almex.test
+      VIRTUAL_PORT: 8088
+      WORDPRESS_DB_NAME: almex_db
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: almex_user
+      WORDPRESS_DB_PASSWORD: test123test!
+      WORDPRESS_DEBUG: 1
+    networks:
+      - frontend
+      - backend
+
+networks:
+  backend:
+  frontend:
+    external:
+      name: proxy
